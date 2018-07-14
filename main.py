@@ -79,15 +79,15 @@ class People():
         # give a rate score based on market and personal trade stat
         a = self.record(c)
         b = self.history(c)
-        return a+b;
+        return a+b
 
     def record(self,c):
         # rate according to personal trade history
         # if it reaches the target profit or stop loss point, the score will be high
         profit = self.calcu_profit(c)
-        if profit >= self.target_profit:
+        if profit > self.target_profit:
             rates = 10
-        elif profit <= self.stop_loss:
+        elif profit < self.stop_loss:
             rates = 10
         else:
             rates = 1
@@ -95,6 +95,7 @@ class People():
 
     def history(self, c):
         # rate according to market trade history
+
         return  10
 
     def calcu_profit(self,c):
@@ -117,9 +118,7 @@ class Event():
 
 # market is a place to calculate the result
 class Market():
-    def __init__(self, all_people, all_company):
-        pass
-
+    test = 1
     def buy(self, p, c, amount):
         pass
 
@@ -129,7 +128,8 @@ class Market():
     def caculate_c_price(self, c):
         pass
 
-    def trade(self, p, result):
+    @classmethod
+    def trade(cls, p, result):
         if 'buy' in result:
             buy_name = result['buy'][0]['name']
             buy_num = result['buy'][0]['num']
@@ -139,7 +139,11 @@ class Market():
             sell_name = result['sell'][0]['name']
             sell_num = result['sell'][0]['num']
 
+        cls.test += 1
 
+    @classmethod
+    def getc_history(cls, c):
+        pass
 
 
 # Game thread
@@ -169,10 +173,7 @@ class Game():
             self.c_ls[name] = c
             print('build c ---')
 
-        print (self.p_ls)
-        print (self.c_ls)
-
-        self.market = Market(self.p_ls, self.c_ls)
+        # self.market = Market(self.p_ls, self.c_ls)
         print("start ----")
 
     def run(self):
@@ -191,8 +192,10 @@ class Game():
     def next(self):
         for k, p in self.p_ls.items():
             result = p.decide()
-            self.market.trade(p, result)
+            # self.market.trade(p, result)
+            Market.trade(p,result)
             print ('x ---- ')
+            print(Market.test)
 
 
 if __name__ == '__main__':
