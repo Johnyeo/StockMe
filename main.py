@@ -27,7 +27,7 @@ class People():
         self.cash = cash # = 100
         self.target_profit = 0.5
         self.stop_loss = 0.5
-        self.my_c_ls = []
+        self.my_c_ls = {}
         self.name = name # id
 
     def decide(self):
@@ -36,12 +36,13 @@ class People():
         c_to_sell = {}
         result = {}
 
-        for c in data.c_ls:
+        for k,c in data.getc_ls().items():
             r = self.rate(c)
-            c_rated[c.name] = r
-        for c in self.my_c_ls:
+            c_rated[k] = r
+
+        for k,c in self.my_c_ls.items():
             r = self.rate(c)
-            c_to_sell[c.name] = r
+            c_to_sell[k] = r
 
         if len(c_to_sell) >0:
             best_to_sell = max(c_to_sell,key=c_to_sell.get) # return the max value key
@@ -70,6 +71,7 @@ class People():
             ]
         }
         '''
+        print(self.name)
         print(result)
         return result
 
@@ -128,7 +130,16 @@ class Market():
         pass
 
     def trade(self, p, result):
-        pass
+        if 'buy' in result:
+            buy_name = result['buy'][0]['name']
+            buy_num = result['buy'][0]['num']
+            cost = data.getc_ls()
+
+        if 'sell' in result:
+            sell_name = result['sell'][0]['name']
+            sell_num = result['sell'][0]['num']
+
+
 
 
 # Game thread
@@ -145,15 +156,21 @@ class Game():
         print("game init")
 
     def start(self):
-        for i in range(3):
-            p = People(1,'A',100)
-            self.p_ls.append(p)
+        # loop num is how many people/companies created
+        for i in range(2):
+            name = data.getRandom_notrepeat_name(data.people_name_pool)
+            p = People(name,'A',100)
+            self.p_ls[name] = p
             print ('build p --- ')
 
-        for i in range(3):
-            c = Company('Google','A',100)
-            self.c_ls.append(c)
+        for i in range(2):
+            name = data.getRandom_notrepeat_name(data.company_name_pool)
+            c = Company(name,'A',100)
+            self.c_ls[name] = c
             print('build c ---')
+
+        print (self.p_ls)
+        print (self.c_ls)
 
         self.market = Market(self.p_ls, self.c_ls)
         print("start ----")
@@ -172,7 +189,7 @@ class Game():
         self.start_bl = False
 
     def next(self):
-        for p in self.p_ls:
+        for k, p in self.p_ls.items():
             result = p.decide()
             self.market.trade(p, result)
             print ('x ---- ')
