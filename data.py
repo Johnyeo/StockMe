@@ -10,7 +10,7 @@ c_ls = {}
 secret_ls= {}
 event_ls = {}
 
-people_name_pool = ['john','stephen','susan']
+people_name_pool = ['john','stephen','susan', 'alex','lisa','harry','nancy','robin','ammy','judy']
 company_name_pool = ['google','microsoft','tencent']
 
 

@@ -16,10 +16,11 @@ class Company():
     # company A , developing industry
     # company B, developed industry
     # company C, decline industry
-    def __init__(self,name, type, active):
+    def __init__(self,name, type, share_num, price):
         self.name = name
         self.type = type # = 'developing'
-        self.active = active # = 10
+        self.share_num = share_num
+        self.price = price # price per share
 
 class People():
     def __init__(self, name, type, cash):
@@ -29,6 +30,7 @@ class People():
         self.stop_loss = 0.5
         self.my_c_ls = {}
         self.name = name # id
+        self.risk_preference = 0.5
 
     def decide(self):
         # c_rated for companies that has been rated, the sell the one with highest score
@@ -71,7 +73,6 @@ class People():
             ]
         }
         '''
-        print(self.name)
         print(result)
         return result
 
@@ -118,7 +119,7 @@ class Event():
 
 # market is a place to calculate the result
 class Market():
-    test = 1
+
     @classmethod
     def buy(cls, p, c_name, amount):
         actual_result = {'isSuccess':False, 'result':{'name':'google', 'num':5}}
@@ -158,8 +159,6 @@ class Market():
             elif actual_result['isSuccess'] == False:
                 buy_success = 0
 
-        cls.test += 1
-
     @classmethod
     def getc_history(cls, c):
         pass
@@ -180,15 +179,15 @@ class Game():
 
     def start(self):
         # loop num is how many people/companies created
-        for i in range(2):
+        for i in range(10):
             name = data.getRandom_notrepeat_name(data.people_name_pool)
             p = People(name,'A',100)
             self.p_ls[name] = p
             print ('build p --- ')
 
-        for i in range(2):
+        for i in range(3):
             name = data.getRandom_notrepeat_name(data.company_name_pool)
-            c = Company(name,'A',100)
+            c = Company(name,'A',100, 5)
             self.c_ls[name] = c
             print('build c ---')
 
@@ -209,13 +208,15 @@ class Game():
         self.start_bl = False
 
     def next(self):
+        c_ls = data.getc_ls()
+        p_ls = data.getp_ls()
+        print(c_ls)
+        print(p_ls)
+
         for k, p in self.p_ls.items():
             result = p.decide()
             # self.market.trade(p, result)
             isSuccess = Market.trade(p,result)
-            print ('x ---- ')
-            print(Market.test)
-
 
 if __name__ == '__main__':
     game = Game()
