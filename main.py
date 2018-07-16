@@ -210,8 +210,20 @@ class Game():
     def next(self):
         c_ls = data.getc_ls()
         p_ls = data.getp_ls()
-        print(c_ls)
-        print(p_ls)
+
+        print('People\n'+40*'=')
+        for k, v in p_ls.items():
+            # print(k + ' ' + v.cash + ' ' + v.risk_preference)
+            print(k, end='\t\t\t')
+            print(v.cash, end='\t\t\t ')
+            print(v.risk_preference)
+
+        print('Company\n' + 40*'=')
+        for k, v in c_ls.items():
+            print(k, end='\t\t\t')
+            print(v.share_num, end='\t\t\t')
+            print(v.price)
+
 
         for k, p in self.p_ls.items():
             result = p.decide()
