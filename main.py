@@ -119,25 +119,44 @@ class Event():
 # market is a place to calculate the result
 class Market():
     test = 1
-    def buy(self, p, c, amount):
-        pass
+    @classmethod
+    def buy(cls, p, c_name, amount):
+        actual_result = {'isSuccess':False, 'result':{'name':'google', 'num':5}}
+        return actual_result
 
-    def sell(self, p, c, amount):
-        pass
-
-    def caculate_c_price(self, c):
-        pass
+    @classmethod
+    def sell(cls, p, c_name, amount):
+        actual_result = {'isSuccess': False, 'result': {'name': 'google', 'num': 5}}
+        return actual_result
 
     @classmethod
     def trade(cls, p, result):
+        buy_success = -1
+        sell_success = -1
+
         if 'buy' in result:
             buy_name = result['buy'][0]['name']
             buy_num = result['buy'][0]['num']
-            cost = data.getc_ls()
+            actual_result = cls.buy(p,buy_name,buy_num)
+
+            if actual_result['isSuccess'] == True:
+                buy_success = 1
+                buy_result = actual_result['result']
+
+            elif actual_result['isSuccess'] == False:
+                buy_success = 0
 
         if 'sell' in result:
             sell_name = result['sell'][0]['name']
             sell_num = result['sell'][0]['num']
+            actual_result = cls.sell(p,sell_name, sell_num)
+
+            if actual_result['isSuccess'] == True:
+                buy_success = 1
+                buy_result = actual_result['result']
+
+            elif actual_result['isSuccess'] == False:
+                buy_success = 0
 
         cls.test += 1
 
@@ -193,7 +212,7 @@ class Game():
         for k, p in self.p_ls.items():
             result = p.decide()
             # self.market.trade(p, result)
-            Market.trade(p,result)
+            isSuccess = Market.trade(p,result)
             print ('x ---- ')
             print(Market.test)
 
