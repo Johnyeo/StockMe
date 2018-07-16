@@ -56,7 +56,6 @@ class People():
             buy_num = 10
             result['buy'] = [{'name':best_to_buy, 'num':buy_num}]
 
-
         # 1 decision only buy / sell 1 stock , num fixed to be 10
         '''
         result = {
@@ -73,7 +72,6 @@ class People():
             ]
         }
         '''
-        print(result)
         return result
 
     def rate(self,c,secret=None, event=None):
@@ -179,17 +177,16 @@ class Game():
 
     def start(self):
         # loop num is how many people/companies created
+        print('build p')
         for i in range(10):
             name = data.getRandom_notrepeat_name(data.people_name_pool)
             p = People(name,'A',100)
             self.p_ls[name] = p
-            print ('build p --- ')
-
+        print('build c')
         for i in range(3):
             name = data.getRandom_notrepeat_name(data.company_name_pool)
             c = Company(name,'A',100, 5)
             self.c_ls[name] = c
-            print('build c ---')
 
         # self.market = Market(self.p_ls, self.c_ls)
         print("start ----")
@@ -211,24 +208,46 @@ class Game():
         c_ls = data.getc_ls()
         p_ls = data.getp_ls()
 
+        print()
+
         print('People\n'+40*'=')
         for k, v in p_ls.items():
             # print(k + ' ' + v.cash + ' ' + v.risk_preference)
             print(k, end='\t\t\t')
-            print(v.cash, end='\t\t\t ')
-            print(v.risk_preference)
+            print('$%s'%v.cash, end='\t\t\t ')
+            print('%d%%'%(v.risk_preference*100))
+
+        print()
 
         print('Company\n' + 40*'=')
         for k, v in c_ls.items():
             print(k, end='\t\t\t')
             print(v.share_num, end='\t\t\t')
-            print(v.price)
+            print('$%s'%v.price)
 
+        print(40*'*')
 
-        for k, p in self.p_ls.items():
-            result = p.decide()
-            # self.market.trade(p, result)
-            isSuccess = Market.trade(p,result)
+        for k, v in p_ls.items():
+            print()
+            print(k, end='\t\t')
+            print('$%s'%v.cash)
+            print('='*40)
+            print('rate')
+            for c_name, c_obj in c_ls.items():
+                print('\t\t%s'%c_name, end='\t')
+                score = v.rate(c_obj)
+                print(score)
+
+            print('-'*40)
+            c_buy = 'google'
+            c_sell = 'ibm'
+            # buy
+            print('buy\t%s' % c_buy)
+            # sell
+            print('sell\t%s' % c_sell)
+
+            # result = p.decide()
+            # isSuccess = Market.trade(p,result)
 
 if __name__ == '__main__':
     game = Game()
