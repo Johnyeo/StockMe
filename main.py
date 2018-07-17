@@ -9,6 +9,8 @@ People will decide which one company's stock they will buy, based on information
 5. event is known by everybody and gives a strong, trendcy influence on all companies or people.
 
 '''
+import random
+
 import data
 
 
@@ -78,7 +80,8 @@ class People():
         # give a rate score based on market and personal trade stat
         a = self.record(c)
         b = self.history(c)
-        return a+b
+        score = random.randint(-5,5)
+        return score
 
     def record(self,c):
         # rate according to personal trade history
@@ -231,20 +234,47 @@ class Game():
             print()
             print(k, end='\t\t')
             print('$%s'%v.cash)
-            print('='*40)
+            print('='*80)
             print('rate')
+            temp_c_ls = {}
+            do_buy = False
+            do_sell = False
+
             for c_name, c_obj in c_ls.items():
                 print('\t\t%s'%c_name, end='\t')
                 score = v.rate(c_obj)
-                print(score)
+                print(score, end = '\t')
+                temp_c_ls[c_name] = score
 
-            print('-'*40)
-            c_buy = 'google'
-            c_sell = 'ibm'
+            c_max = max(temp_c_ls, key=temp_c_ls.get)
+            c_min = min(temp_c_ls, key=temp_c_ls.get)
+            if temp_c_ls[c_max] > 0:
+                do_buy = True
+
+            if temp_c_ls[c_min] < 0:
+                do_sell = True
+
+            print()
+            print('-'*80)
+
             # buy
-            print('buy\t%s' % c_buy)
+            if do_buy:
+                c_buy = c_max
+                expection_rise = temp_c_ls[c_max]
+                buy_percent = expection_rise / 5 * v.risk_preference
+                print('buy \t%s   \t%s/5 * %s = %s' % (c_buy, expection_rise, v.risk_preference, buy_percent))
+            else:
+                print('buy \tnone')
+
             # sell
-            print('sell\t%s' % c_sell)
+            if do_sell:
+                c_sell = c_min
+                expection_fall = temp_c_ls[c_min]
+                sell_percent = expection_fall/5
+
+                print('sell\t%s   \t%s' % (c_sell, sell_percent))
+            else:
+                print('sell\tnone')
 
             # result = p.decide()
             # isSuccess = Market.trade(p,result)
