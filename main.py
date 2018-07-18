@@ -27,12 +27,14 @@ class Company():
 class People():
     def __init__(self, name, type, cash):
         self.type = type # = 'risky'
-        self.cash = cash # = 100
+        self.start_cash = cash # = 100
+        self.cash = cash
         self.target_profit = 0.5
         self.stop_loss = 0.5
         self.my_c_ls = {}
         self.name = name # id
         self.risk_preference = 0.5
+        self.own_share = {}
 
     def decide(self):
         # c_rated for companies that has been rated, the sell the one with highest score
@@ -237,37 +239,45 @@ class Game():
             print('='*80)
             print('rate')
             temp_c_ls = {}
-            do_buy = False
-            do_sell = False
 
             for c_name, c_obj in c_ls.items():
                 print('\t\t%s'%c_name, end='\t')
                 score = v.rate(c_obj)
                 print(score, end = '\t')
                 temp_c_ls[c_name] = score
-
             c_max = max(temp_c_ls, key=temp_c_ls.get)
             c_min = min(temp_c_ls, key=temp_c_ls.get)
-            if temp_c_ls[c_max] > 0:
-                do_buy = True
 
-            if temp_c_ls[c_min] < 0:
-                do_sell = True
+            print()
+            print('-'*80)
+            print('share')
+
+            for c_name, c_num in v.own_share.items():
+                print('\t\t%s' % c_name, end='\t')
+                share = c_num
+                print(share, end='\t')
 
             print()
             print('-'*80)
 
             # buy
-            if do_buy:
+            if temp_c_ls[c_max] > 0:
                 c_buy = c_max
                 expection_rise = temp_c_ls[c_max]
                 buy_percent = expection_rise / 5 * v.risk_preference
+                cost = buy_percent * v.start_cash
+                # if v.cash - cost >= 0:
+                v.cash = v.cash - cost
+                c_buy_obj = data.getc_ls()[c_buy]
+                v.own_share[c_buy] = cost / c_buy_obj.price
+                c_buy_obj.share_num -= cost/c_buy_obj.price
                 print('buy \t%s   \t%s/5 * %s = %s' % (c_buy, expection_rise, v.risk_preference, buy_percent))
+
             else:
                 print('buy \tnone')
 
             # sell
-            if do_sell:
+            if temp_c_ls[c_min] < 0:
                 c_sell = c_min
                 expection_fall = temp_c_ls[c_min]
                 sell_percent = expection_fall/5
