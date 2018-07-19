@@ -24,6 +24,7 @@ class Company():
         self.share_num_start = share_num
         self.share_num = share_num
         self.share_num_last_time = share_num
+        self.demand = 1
         self.price_start = price
         self.price = price # price per share
         self.price_last_time = price
@@ -194,7 +195,7 @@ class Game():
         print('build c')
         for i in range(3):
             name = data.getRandom_notrepeat_name(data.company_name_pool)
-            c = Company(name,'A',100, 5)
+            c = Company(name,'A',10, 5)
             self.c_ls[name] = c
 
         # self.market = Market(self.p_ls, self.c_ls)
@@ -223,7 +224,7 @@ class Game():
         for k, v in p_ls.items():
             # print(k + ' ' + v.cash + ' ' + v.risk_preference)
             print(k, end='\t\t\t')
-            print('$%s'%v.cash, end='\t\t\t ')
+            print('$%.2f'%v.cash, end='\t\t\t ')
             print('%d%%'%(v.risk_preference*100))
 
         print()
@@ -232,14 +233,14 @@ class Game():
         for k, v in c_ls.items():
             print(k, end='\t\t\t')
             print(v.share_num, end='\t\t\t')
-            print('$%s'%v.price)
+            print('$%.2f'%v.price)
 
         print(40*'*')
 
         for k, v in p_ls.items():
             print()
             print(k, end='\t\t')
-            print('$%s'%v.cash)
+            print('$%.2f'%v.cash)
             print('='*80)
             print('rate')
             temp_c_ls = {}
@@ -259,7 +260,7 @@ class Game():
             for c_name, c_num in v.own_share.items():
                 print('\t\t%s' % c_name, end='\t')
                 share = c_num
-                print(share, end='\t')
+                print('%.2f'%share, end='\t')
 
             print()
             print('-'*80)
@@ -270,14 +271,28 @@ class Game():
                 expection_rise = temp_c_ls[c_max]
                 buy_percent = expection_rise / 5 * v.risk_preference
                 cost = buy_percent * v.start_cash
-                # if v.cash - cost >= 0:
-                v.cash = v.cash - cost
-                c_buy_obj = data.getc_ls()[c_buy]
-                buy_shares = cost / c_buy_obj.price
-                v.own_share[c_buy] = buy_shares
-                c_buy_obj.share_num -= buy_shares
-                print('buy \t%s   \t%s/5 * %s = %s\t\t%s' % (c_buy, expection_rise, v.risk_preference, buy_percent, buy_shares))
-
+                if v.cash - cost >= 0:
+                    c_buy_obj = data.getc_ls()[c_buy]
+                    buy_shares = cost / c_buy_obj.price
+                    if c_buy_obj.share_num - buy_shares >=0:
+                        v.cash = v.cash - cost
+                        v.own_share[c_buy] = buy_shares
+                        c_buy_obj.share_num -= buy_shares
+                        print('buy \t%s   \t%s/5 * %.2f = %.2f\t\t%.2f\t\t cost %.2f ' % (c_buy, expection_rise, v.risk_preference, buy_percent, buy_shares, cost))
+                    else:
+                        buy_shares = c_buy_obj.share_num
+                        cost = buy_shares * c_buy_obj.price
+                        v.cash = v.cash - cost
+                        if c_buy in v.own_share:
+                            original_share = v.own_share[c_buy]
+                            v.own_share[c_buy] = buy_shares+original_share
+                            c_buy_obj.share_num -= buy_shares
+                        else:
+                            v.own_share[c_buy] = buy_shares
+                            c_buy_obj.share_num -= buy_shares
+                        print('buy %s\t %.2f failed: %s' %(c_buy, buy_shares, 'insuffcient share'))
+                else:
+                    print('buy %s\t %.2f failed: %s' % ( c_buy, cost, 'insuffcient gold'))
             else:
                 print('buy \tnone')
 
@@ -289,12 +304,12 @@ class Game():
                 if c_sell in v.own_share:
                     c_obj = data.getc_ls()[c_sell]
                     sell_shares = v.own_share[c_sell] * sell_percent
-                    earn = sell_shares  * c_obj.price
+                    earn = abs(sell_shares  * c_obj.price)
                     v.cash = v.cash + earn
                     c_obj.share_num += sell_shares
-                    print('sell\t%s   \t%s' % (c_sell, sell_percent))
+                    print('sell\t%s   \t%.2f' % (c_sell, sell_percent))
                 else :
-                    print('sell\t%s   \t%s\tfailed: %s'%(c_sell, sell_percent, 'insuffcient share'))
+                    print('sell\t%s   \t%.2f\tfailed: %s'%(c_sell, sell_percent, 'insuffcient share'))
             else:
                 print('sell\tnone')
 
@@ -306,12 +321,13 @@ class Game():
             # -(5 / 5 - 1) * $5 / s = $0 / s
             # compare with last time or orgin pubish price? this is a problem unsolved
             # new_price = -(v.share_num/v.share_num_last_time - 1) * v.price
+            v.demand = -(v.share_num/v.share_num_start - 1)
             new_price = -(v.share_num/v.share_num_start - 1) * v.price
             # prevent the price below 0, for test
             if new_price <= 0.1:
                 new_price = 0.1
             print('-(%.2f/%.2f-1)* %.2f'%(v.share_num, v.share_num_start, v.price), end='\t\t\t')
-            print('newprice %.2f, newshare %.2f'%(new_price, v.share_num))
+            print('newprice %.2f, newshare %.2f demand %.2f'%(new_price, v.share_num, v.demand))
             v.share_num_last_time = v.share_num
             v.price_last_time = v.price
             v.price = new_price
