@@ -21,8 +21,12 @@ class Company():
     def __init__(self,name, type, share_num, price):
         self.name = name
         self.type = type # = 'developing'
+        self.share_num_start = share_num
         self.share_num = share_num
+        self.share_num_last_time = share_num
+        self.price_start = price
         self.price = price # price per share
+        self.price_last_time = price
 
 class People():
     def __init__(self, name, type, cash):
@@ -269,9 +273,10 @@ class Game():
                 # if v.cash - cost >= 0:
                 v.cash = v.cash - cost
                 c_buy_obj = data.getc_ls()[c_buy]
-                v.own_share[c_buy] = cost / c_buy_obj.price
-                c_buy_obj.share_num -= cost/c_buy_obj.price
-                print('buy \t%s   \t%s/5 * %s = %s' % (c_buy, expection_rise, v.risk_preference, buy_percent))
+                buy_shares = cost / c_buy_obj.price
+                v.own_share[c_buy] = buy_shares
+                c_buy_obj.share_num -= buy_shares
+                print('buy \t%s   \t%s/5 * %s = %s\t\t%s' % (c_buy, expection_rise, v.risk_preference, buy_percent, buy_shares))
 
             else:
                 print('buy \tnone')
@@ -281,10 +286,36 @@ class Game():
                 c_sell = c_min
                 expection_fall = temp_c_ls[c_min]
                 sell_percent = expection_fall/5
-
-                print('sell\t%s   \t%s' % (c_sell, sell_percent))
+                if c_sell in v.own_share:
+                    c_obj = data.getc_ls()[c_sell]
+                    sell_shares = v.own_share[c_sell] * sell_percent
+                    earn = sell_shares  * c_obj.price
+                    v.cash = v.cash + earn
+                    c_obj.share_num += sell_shares
+                    print('sell\t%s   \t%s' % (c_sell, sell_percent))
+                else :
+                    print('sell\t%s   \t%s\tfailed: %s'%(c_sell, sell_percent, 'insuffcient share'))
             else:
                 print('sell\tnone')
+
+        print('\nSummary\n' + 40*'=')
+        for k, v in c_ls.items():
+            print(k, end='\t\t\t')
+            print('%.2f'%v.share_num, end='\t\t\t')
+            print('$%.2f'%v.price, end='\t\t\t')
+            # -(5 / 5 - 1) * $5 / s = $0 / s
+            # compare with last time or orgin pubish price? this is a problem unsolved
+            # new_price = -(v.share_num/v.share_num_last_time - 1) * v.price
+            new_price = -(v.share_num/v.share_num_start - 1) * v.price
+            # prevent the price below 0, for test
+            if new_price <= 0.1:
+                new_price = 0.1
+            print('-(%.2f/%.2f-1)* %.2f'%(v.share_num, v.share_num_start, v.price), end='\t\t\t')
+            print('newprice %.2f, newshare %.2f'%(new_price, v.share_num))
+            v.share_num_last_time = v.share_num
+            v.price_last_time = v.price
+            v.price = new_price
+
 
             # result = p.decide()
             # isSuccess = Market.trade(p,result)
