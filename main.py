@@ -188,14 +188,14 @@ class Game():
     def start(self):
         # loop num is how many people/companies created
         print('build p')
-        for i in range(10):
+        for i in range(3):
             name = data.getRandom_notrepeat_name(data.people_name_pool)
-            p = People(name,'A',100)
+            p = People(name,'A',10)
             self.p_ls[name] = p
         print('build c')
-        for i in range(3):
+        for i in range(1):
             name = data.getRandom_notrepeat_name(data.company_name_pool)
-            c = Company(name,'A',10, 5)
+            c = Company(name,'A',5, 5)
             self.c_ls[name] = c
 
         # self.market = Market(self.p_ls, self.c_ls)
@@ -221,6 +221,7 @@ class Game():
         print()
 
         print('People\n'+40*'=')
+        # loop all people, key is the unique name of the person, v is the people instance
         for k, v in p_ls.items():
             # print(k + ' ' + v.cash + ' ' + v.risk_preference)
             print(k, end='\t\t\t')
@@ -230,13 +231,14 @@ class Game():
         print()
 
         print('Company\n' + 40*'=')
+        # loop all Companies, key is the unique name of the company, v is the Company instance
         for k, v in c_ls.items():
             print(k, end='\t\t\t')
             print(v.share_num, end='\t\t\t')
             print('$%.2f'%v.price)
 
         print(40*'*')
-
+        # decision board of individual
         for k, v in p_ls.items():
             print()
             print(k, end='\t\t')
@@ -244,7 +246,7 @@ class Game():
             print('='*80)
             print('rate')
             temp_c_ls = {}
-
+            # rate, score, also rise expection, range from -5 to 5
             for c_name, c_obj in c_ls.items():
                 print('\t\t%s'%c_name, end='\t')
                 score = v.rate(c_obj)
@@ -256,7 +258,7 @@ class Game():
             print()
             print('-'*80)
             print('share')
-
+            # personal own company stocks number
             for c_name, c_num in v.own_share.items():
                 print('\t\t%s' % c_name, end='\t')
                 share = c_num
@@ -264,16 +266,18 @@ class Game():
 
             print()
             print('-'*80)
-
+            # if rise expection > 0
             # buy
             if temp_c_ls[c_max] > 0:
                 c_buy = c_max
                 expection_rise = temp_c_ls[c_max]
                 buy_percent = expection_rise / 5 * v.risk_preference
                 cost = buy_percent * v.start_cash
+
                 if v.cash - cost >= 0:
                     c_buy_obj = data.getc_ls()[c_buy]
                     buy_shares = cost / c_buy_obj.price
+
                     if c_buy_obj.share_num - buy_shares >=0:
                         v.cash = v.cash - cost
                         v.own_share[c_buy] = buy_shares
@@ -283,6 +287,7 @@ class Game():
                         buy_shares = c_buy_obj.share_num
                         cost = buy_shares * c_buy_obj.price
                         v.cash = v.cash - cost
+
                         if c_buy in v.own_share:
                             original_share = v.own_share[c_buy]
                             v.own_share[c_buy] = buy_shares+original_share
@@ -303,7 +308,7 @@ class Game():
                 sell_percent = expection_fall/5
                 if c_sell in v.own_share:
                     c_obj = data.getc_ls()[c_sell]
-                    sell_shares = v.own_share[c_sell] * sell_percent
+                    sell_shares = abs(v.own_share[c_sell] * sell_percent)
                     earn = abs(sell_shares  * c_obj.price)
                     v.cash = v.cash + earn
                     c_obj.share_num += sell_shares
