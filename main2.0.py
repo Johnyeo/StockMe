@@ -127,49 +127,82 @@ class news(object):
 
         }
 
-
         self.topics = [
             # 科技突破
-            {'type':'特定领域',
-             'desc':'qh大学发现一种新材料，电池能量密度有望突破！',
-             'pro_area':['新能源'],  # 利好行业
-             'cons_area':['能源'],   # 利空行业
+            {'type': '特定领域',
+             'desc': 'qh大学发现一种新材料，电池能量密度有望突破！',
+             'pro_area': ['新能源'],  # 利好行业
+             'cons_area': ['能源'],  # 利空行业
              },
 
             # 随机公司
-            {'type':'随机公司',
-             'desc':'产品曝出质量问题，正在花钱撤热搜！',
+            {'type': '随机公司',
+             'desc': '产品曝出质量问题，正在花钱撤热搜！',
              'is_pro': 0
              },
-            {'type':'随机公司',
-             'desc':'内部问题重重，高管相继离职！',
+            {'type': '随机公司',
+             'desc': '内部问题重重，高管相继离职！',
              'is_pro': 0
              },
-            {'type':'随机公司',
-             'desc':'获得一笔战略投资，准备积极扩张！',
+            {'type': '随机公司',
+             'desc': '获得一笔战略投资，准备积极扩张！',
              'is_pro': 1
              },
 
             # 房地产企业
-            {'type':'特定领域',
-             'desc':'为应对炒房客，政府准备实行更严格的限购政策',
-             'cons_area':['房地产'],
-             'group':'房地产调控'
+            {'type': '特定领域',
+             'desc': '为应对炒房客，政府准备实行更严格的限购政策',
+             'cons_area': ['房地产'],
+             'group': '房地产调控'
              },
-            {'type':'特定领域',
-             'desc':'为提振低迷的房地产行业，政府准备放松限购政策',
-             'pro_area':['房地产'],
-             'group':'房地产调控'
+            {'type': '特定领域',
+             'desc': '为提振低迷的房地产行业，政府准备放松限购政策',
+             'pro_area': ['房地产'],
+             'group': '房地产调控'
              },
+
+            # 医药
+            {'type': '特定领域',
+             'desc': '政府酝酿开启新一轮的医疗集采，据说谈判非常激烈！',
+             'cons_area': ['医药'],
+             },
+            {'type': '特定领域',
+             'desc': 'mRNA疫苗重大突破，多种癌症都有望通过疫苗预防！',
+             'pro_area': ['医药']
+             },
+
+            # 银行
+            {'type': '特定领域',
+             'desc': '央行准备降准，商业银行的困境有望缓解',
+             'pro_area': ['银行']
+             },
+            {'type': '特定领域',
+             'desc': '金融领域的危机比想象的严重，银行业面临洗牌',
+             'cons_area': ['银行']
+             },
+
+            # 游戏传媒
+            {'type': '特定领域',
+             'desc': '显卡的制造成本大降，游戏开发者不用为了优化游戏画面而掉头发了！',
+             'pro_area': ['游戏传媒']
+             },
+            {'type': '特定领域',
+             'desc': '家长成立联盟，共同起诉游戏公司危害孩子视力！',
+             'cons_area': ['游戏传媒']
+             },
+
+            # 农业
+            {'type': '特定领域', 'desc': '猪肉价快速上涨，可能和近期的粮食危机有关', 'pro_area': ['农业']},
+            {'type': '特定领域', 'desc': '一篇新闻稿引起广泛讨论，大多数的转基因食品其实并不安全', 'cons_area': ['农业']},
 
 
         ]
+
         print(area_ls)
         self.area_ls = area_ls
         self.market_obj = market_obj
         self.start_date = start_date
         self.event_num = 0
-
 
     def generate_new_event(self):
         event_chance = random.randint(0, 100) / 100
@@ -179,7 +212,6 @@ class news(object):
             # 随机选择事件
             topic = random.choice(self.topics)
             # todo 需要检验，有没有矛盾的事件
-
 
             if topic['type'] == '特定领域':
                 # 生成event_code
@@ -194,30 +226,30 @@ class news(object):
                     # effect_intensity = random.randint(11, 15)/10
 
                     # 下面这个相比上面好些。但最大的就是倍数是2
-                    xx = random.randint(1,10)
-                    xxx = xx*xx/100
+                    xx = random.randint(1, 10)
+                    xxx = xx * xx / 100
                     print('xxx', end=' ')
                     print(xxx)
                     effect_intensity = (1.9 - xxx)
 
                     for area in topic['pro_area']:
-                        effect.append({'area':area, 'price': effect_intensity})
+                        effect.append({'area': area, 'price': effect_intensity})
 
                 if 'cons_area' in topic:
                     yy = random.randint(90, 100)
-                    effect_intensity = yy * yy/10000
+                    effect_intensity = yy * yy / 10000
                     print('yyy', end=' ')
                     print(effect_intensity)
 
                     for area in topic['cons_area']:
-                        effect.append({'area': area,'price': effect_intensity})
+                        effect.append({'area': area, 'price': effect_intensity})
 
             elif topic['type'] == '随机公司':
                 event_code = str(self.event_num)
 
                 source = random.choice(self.source)
 
-                last = random.randint(1,5)
+                last = random.randint(1, 5)
 
                 # 随机一个company_code
                 company_code = random.choice(list(self.market_obj.keys()))
@@ -225,22 +257,22 @@ class news(object):
                 event_desc = self.market_obj[company_code]['name'] + topic['desc']
 
                 if topic['is_pro'] == 1:
-                    xx = random.randint(1,10)
-                    xxx = xx*xx/100
+                    xx = random.randint(1, 10)
+                    xxx = xx * xx / 100
                     effect_intensity = (1.9 - xxx)
 
-                    effect = [{'code':company_code, 'price': effect_intensity}]
+                    effect = [{'code': company_code, 'price': effect_intensity}]
 
                 if topic['is_pro'] == 0:
                     yy = random.randint(90, 100)
-                    effect_intensity = yy * yy/10000
-                    effect = [{'code':company_code, 'price': effect_intensity}]
+                    effect_intensity = yy * yy / 10000
+                    effect = [{'code': company_code, 'price': effect_intensity}]
             else:
                 pass
 
             event = {
-                event_code:{
-                    'effects':effect,
+                event_code: {
+                    'effects': effect,
                     'last': last,
                     'source': source,
                     'desc': event_desc
@@ -334,13 +366,12 @@ class market(object):
         company = {
             company_code: {
                 'name': company_name, 'price': price, 'code': company_code, 'quick_name': quick_name,
-                'area': {area_name:area_relevent},
+                'area': {area_name: area_relevent},
                 'tendency': '-'
             }
         }
 
         return company
-
 
     def generate_companies(self, n):
         companies = {}
@@ -349,7 +380,6 @@ class market(object):
             company = self.generate_company()
             companies.update(company)
         return companies
-
 
     def next_round(self):
 
@@ -380,7 +410,6 @@ class market(object):
         print(self.last_round_market_obj)
         print(self.market_obj)
 
-
     def fuzzy_search_company_name(self, target):
         for key, content in self.market_obj.items():
             # print(key)
@@ -399,14 +428,14 @@ class investor(object):
         }
         self.cost_base = 10
         self.cost_total = 10
-        self.status = {} # ['starve', 'good', 'ill', 'dead', 'jail']
+        self.status = {}  # ['starve', 'good', 'ill', 'dead', 'jail']
 
         self.capital = 0
 
     def caculate_capital(self, market_obj):
         capital = 0
         for company_code, company in self.hold_obj.items():
-            capital += market_obj[company_code]['price']*company['amount']
+            capital += market_obj[company_code]['price'] * company['amount']
         self.capital = capital
 
     def next_round(self):
@@ -416,6 +445,8 @@ class investor(object):
         if self.fund < 0:
             if 'starve' in self.status:
                 self.status['starve'] += 1
+                if self.status['starve'] > 3:
+                    self.status['dead'] = 1
             else:
                 self.status['starve'] = 1
         else:
@@ -439,7 +470,7 @@ class investor(object):
         gametips = [
             '每回合都会消耗一定的基础资金，购买食物，支付房租，维持生存',
             '按g可以花钱买消息。但钱不是万能的！',
-            #todo '你的人格魅力，决定了你从熟人获得消息的机会',
+            # todo '你的人格魅力，决定了你从熟人获得消息的机会',
             '公司的名字通常和他们的主营业务有关联，比如互联网企业通常会叫xx网络',
             '有一些公司的主业非常集中，意味着他们对利好/利空消息更敏感'
         ]
@@ -460,12 +491,12 @@ class play_console(object):
     def __init__(self):
         self.window_width = 60
 
-        self.style = 'all_buttons' # all_buttons vs 2_buttons
+        self.style = 'all_buttons'  # all_buttons vs 2_buttons
 
     def draw_board_fragment(self, company_obj, type):
 
         print('-' * self.window_width)
-        space = (self.window_width - 8)//4
+        space = (self.window_width - 8) // 4
         print('公司' + '\t' * space + type)
         print('-' * self.window_width)
 
@@ -474,30 +505,33 @@ class play_console(object):
             if type == '股价':
                 tendency = company['tendency'][-1:]
                 # 汉字占空间大，乘以2
-                content_len = len(company['name'])* 2 + len(company['code']) \
+                content_len = len(company['name']) * 2 + len(company['code']) \
                               + len('%.3f' % company['price'])
 
                 n = (self.window_width - content_len) // 4
 
                 # tendency留个口看历史趋势
-                print('%s(%s)' % (company['name'], company['code']) + '\t' * n + '%.3f' % company[
+                print('%s(%s)' % (company['name'], company['code']) + '\t' + '- --' * (n - 2) + '\t' + '%.3f' % company[
                     'price'] + '\t' + tendency)
             elif type == '数量':
                 content_len = len(company['name']) * 2 + len(company['code']) + len(str(company['amount']))
 
                 n = (self.window_width - content_len) // 4
 
-                print('%s(%s)' % (company['name'], company['code']) + '\t' * n + '%d' % company['amount'])
+                print('%s(%s)' % (company['name'], company['code']) + '\t' + '- --' * (n - 2) + '\t' + '%d' % company[
+                    'amount'])
+
+        print('-' * self.window_width)
 
     def draw_console_fragment(self, button1, button2):
         print('_' * self.window_width)
-        space = (self.window_width - 14)//4
+        space = (self.window_width - 14) // 4
         print(button1 + '\t' * space + button2)
 
     def draw_console_all_button_fragment(self):
-        content = [{'name':'持仓','btn':'c'}, {'name':'交易','btn':'j'},
-        {'name':'调研','btn':'d'}, {'name':'市场','btn':'s'},{'name':'消息', 'btn':'x'},
-        {'name':'下一回合', 'btn':'n'}]
+        content = [{'name': '持仓', 'btn': 'c'}, {'name': '交易', 'btn': 'j'},
+                   {'name': '调研', 'btn': 'd'}, {'name': '市场', 'btn': 's'}, {'name': '消息', 'btn': 'x'},
+                   {'name': '下一回合', 'btn': 'n'}]
         c_len = 2 + 1 + 2 + 1 + 2
         # 汉字2，字母1，括号2，分割竖线1
         result = '| '
@@ -514,7 +548,7 @@ class play_console(object):
         print(result)
 
     def draw_hold_page(self, hold_obj):
-        space = (self.window_width - 8)//8
+        space = (self.window_width - 8) // 8
         print('\t' * space + '【持仓】')
         self.draw_board_fragment(hold_obj, '数量')
         if self.style == '2_buttons':
@@ -577,29 +611,29 @@ class play_console(object):
         if len(up) > 0:
             print(up * self.window_width)
         result = ''
-        for i in range(0, len(content), self.window_width//2):
-            result += content[i:i + self.window_width//2] + '\n\t'
+        for i in range(0, len(content), self.window_width // 2):
+            result += content[i:i + self.window_width // 2] + '\n\t'
 
         print('\t' + result)
-        if len(down)>0:
+        if len(down) > 0:
             print(down * self.window_width)
 
     def do_transaction(self, company_code, amount):
         pass
 
-    def do_investigation(self, player, this_news):
+    def do_investigation_market(self, player, this_news, cost):
         # 检查用户余额是否够100
-        if player.fund < 100:
+        if player.fund < cost:
             print('你的钱不够！你当前只有%.3f' % player.fund)
         else:
-            player.fund += -100.0
+            player.fund -= cost
             is_get_message_success = False
 
             for current_event_key, current_event in this_news.current_events.items():
                 # 获取消息的概率
                 success_chance = random.randint(0, 100) / 100
                 # 0.1表示有10%的概率获得
-                if success_chance < 0.5:
+                if success_chance < 0.8:
                     # 如果已经收到过的消息，就pass掉
                     if current_event_key in this_news.known_events:
                         pass
@@ -613,6 +647,35 @@ class play_console(object):
 
             if is_get_message_success is False:
                 print('没什么消息，一无所获！当前资金：%.2f' % player.fund)
+
+    def do_investigation_company(self, player, this_market, company_code, cost):
+        # 检查用户余额是否够100
+        if player.fund < cost:
+            print('你的钱不够！你当前只有%.3f' % player.fund)
+        else:
+            player.fund -= cost
+            # 获取消息的概率
+            success_chance = random.randint(0, 100) / 100
+            # 0.1表示有10%的概率获得
+            if success_chance < 0.8:
+                # 公司
+                if company_code in this_market:
+                    company = this_market[company_code]
+                    # 获取公司主营
+                    area_desc = ''
+                    for area_name, area_relevance in company['area'].items():
+                        area_desc += area_name + '(相关度：' + str(area_relevance) + '}'
+
+                    # 返回公司信息
+                    print('%s 目前的主营领域有: %s' % (company['name'], area_desc))
+                    print('你现在的资金：%.2f' % player.fund)
+                else:
+                    print('没有找到这个公司')
+
+            else:
+                print('没什么消息，一无所获！当前资金：%.2f' % player.fund)
+
+
 
     def run(self):
         # 初始化数据
@@ -652,7 +715,6 @@ class play_console(object):
             self.draw_market_page(this_market.market_obj)
             cmd = input('\n请输入：')
 
-
             # 点击n进入下一个回合
             while cmd != 'n':
 
@@ -670,14 +732,64 @@ class play_console(object):
 
                 # 调研信息
                 elif cmd == 'd':
-                    is_get_news = input('确定花费100搜集消息？(Y/N)')
-                    if is_get_news.upper() == 'Y':
-                        self.do_investigation(player, this_news)
-                    else:
-                        pass
+                    # 调查市场  调研公司
+                    company_or_market = input('输入公司代码调研公司，输入"enter"调研市场：')
 
-                elif cmd == 'dy':
-                    self.do_investigation(player, this_news)
+                    # 输入enter nothing
+                    if len(company_or_market) == 0:
+                        cost = input('花费多少钱进行调研？(默认100一次)')
+                        if len(cost) > 0:
+                            # 调研市场
+                            try:
+                                cost = float(cost)
+                            except ValueError as e:
+                                print('花费金额不是数字？')
+                                continue
+                        else:
+                            cost = 100
+
+                        self.do_investigation_market(player, this_news, cost)
+
+                    else:
+                        # 调研公司
+                        company_code = company_or_market.upper()
+
+                        # 检查company_code是否在市场里
+                        try:
+                            market_company = this_market.market_obj[company_code]
+
+                        except KeyError as e:
+                            # 没找到，模糊搜索
+                            company_code = this_market.fuzzy_search_company_name(company_code)
+                            if company_code is not None:
+                                c = input('你要找的是%s(%s)吗 (Y/N)' % (
+                                    this_market.market_obj[company_code]['name'],
+                                    this_market.market_obj[company_code]['code']))
+                                if c.upper() == 'Y':
+                                    # market_company = this_market.market_obj[company_code]
+                                    pass
+                                elif c.upper() == 'N':
+                                    continue
+                                else:
+                                    print('')
+                                    continue
+                            else:
+                                print('公司代码不存在')
+                                continue
+
+                        cost = input('花费多少钱进行调研？(默认100一次)')
+                        if len(cost) > 0:
+                            # 调研市场
+                            try:
+                                cost = float(cost)
+                            except ValueError as e:
+                                print('花费金额不是数字？')
+                                continue
+                        else:
+                            cost = 100
+
+                        self.do_investigation_company(player, this_market.market_obj, company_code, cost)
+
 
                 elif cmd == 'j':
 
@@ -768,7 +880,7 @@ class play_console(object):
             print('\n')
             start_date += 1
 
-        # 回合结束
+            # 回合结束
             # 更新人员状态
             player.next_round()
 
