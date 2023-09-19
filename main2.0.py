@@ -4,6 +4,22 @@ from copy import deepcopy
 
 from pypinyin import pinyin, Style
 
+class caculate():
+
+    def generate_random_number_short_curve(self, curve_index=2):
+        # return的结果0-100
+        r = random.randint(0, 100)
+        rr = r ** curve_index
+        result = rr / 100
+        return result
+
+    def generate_random_number_tall_curve(self, curve_index=0.5):
+        # return 的结果 0 - 100
+        r = random.randint(0, 10000)
+        rr = r ** curve_index
+        result = rr
+        return round(result, 2)
+
 
 class names(object):
     def __init__(self):
@@ -301,8 +317,11 @@ class news(object):
 
                 elif 'area' in effect:
                     # 某个领域的价格受到影响
+                    # 相关度
                     for company_code, company in market.items():
+                        # 如果消息行业在公司行业中
                         if effect['area'] in company['area']:
+
                             new_market[company_code]['price'] *= effect['price']
 
             # 减去持续时间
@@ -657,7 +676,8 @@ class play_console(object):
             # 获取消息的概率
             success_chance = random.randint(0, 100) / 100
             # 0.1表示有10%的概率获得
-            if success_chance < 0.8:
+            # 调查公司有0.9的成功率
+            if success_chance < 0.9:
                 # 公司
                 if company_code in this_market:
                     company = this_market[company_code]
@@ -674,7 +694,6 @@ class play_console(object):
 
             else:
                 print('没什么消息，一无所获！当前资金：%.2f' % player.fund)
-
 
 
     def run(self):
