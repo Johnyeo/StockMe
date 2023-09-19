@@ -8,14 +8,14 @@ class caculate():
 
     def generate_random_number_short_curve(self, curve_index=2):
         # return的结果0-100
-        r = random.randint(0, 100)
+        r = random.randint(0, 99)
         rr = r ** curve_index
-        result = rr / 100
+        result = rr / (100**(curve_index-1))
         return result
 
     def generate_random_number_tall_curve(self, curve_index=0.5):
         # return 的结果 0 - 100
-        r = random.randint(0, 10000)
+        r = random.randint(0, round(99**(1/curve_index)))
         rr = r ** curve_index
         result = rr
         return round(result, 2)
@@ -321,8 +321,13 @@ class news(object):
                     for company_code, company in market.items():
                         # 如果消息行业在公司行业中
                         if effect['area'] in company['area']:
+                            relevance = company['area'][effect['area']]/100
 
-                            new_market[company_code]['price'] *= effect['price']
+                            gap = effect['price'] - 1
+
+                            gap *= relevance
+
+                            new_market[company_code]['price'] *= (effect['price'] + 1)
 
             # 减去持续时间
             event['last'] -= 1
@@ -380,7 +385,7 @@ class market(object):
 
         # 行业相关性，正向相关, 相关度越高，对利好和利空越敏感
         # todo：后面还要增加一下，是否有负向相关的因素
-        area_relevent = random.randint(0, 100)
+        area_relevent = caculate().generate_random_number_tall_curve(0.3333) # 生成1-100的数，大数比较多 根号3的函数
 
         company = {
             company_code: {
@@ -405,10 +410,10 @@ class market(object):
         for company_code, company in self.market_obj.items():
             # print(self.last_round_market_obj[company_code])
             # 随机变化金额
-            x = random.randint(95, 105)
-            xx = x / 100
+            # x = random.randint(95, 105)
+            # xx = x / 100
 
-            self.market_obj[company_code]['price'] *= xx
+            # self.market_obj[company_code]['price'] *= xx
             last_round_company = self.last_round_market_obj[company_code]
 
             if last_round_company['price'] - company['price'] > 0.01:
@@ -445,11 +450,14 @@ class investor(object):
         self.hold_obj = {
             # 'AAPL': {'name': '苹果', 'price': 10.2, 'code': 'AAPL', 'amount': 200, }
         }
+
         self.cost_base = 10
         self.cost_total = 10
         self.status = {}  # ['starve', 'good', 'ill', 'dead', 'jail']
 
         self.capital = 0
+
+        self.known_company = {}
 
     def caculate_capital(self, market_obj):
         capital = 0
@@ -531,7 +539,8 @@ class play_console(object):
 
                 # tendency留个口看历史趋势
                 print('%s(%s)' % (company['name'], company['code']) + '\t' + '- --' * (n - 2) + '\t' + '%.3f' % company[
-                    'price'] + '\t' + tendency)
+                    'price'] + '\t' + tendency + '\n')
+
             elif type == '数量':
                 content_len = len(company['name']) * 2 + len(company['code']) + len(str(company['amount']))
 
@@ -671,13 +680,21 @@ class play_console(object):
         # 检查用户余额是否够100
         if player.fund < cost:
             print('你的钱不够！你当前只有%.3f' % player.fund)
+
         else:
+            if cost > 1000:
+                print('仔细想想, 花这么多钱调研一家公司并不值得，1000就足够了')
+                cost = 1000
+
             player.fund -= cost
             # 获取消息的概率
-            success_chance = random.randint(0, 100) / 100
-            # 0.1表示有10%的概率获得
-            # 调查公司有0.9的成功率
-            if success_chance < 0.9:
+            # success_chance = random.randint(0, 100) / 100
+            # 成功率和花费的金钱有关，金钱越多概率越大
+            # 目前是70%左右的概率 如果是1
+            success_chance = caculate().generate_random_number_short_curve(2)  # 0 - 100
+
+
+            if success_chance <= 0.5:
                 # 公司
                 if company_code in this_market:
                     company = this_market[company_code]
@@ -685,9 +702,10 @@ class play_console(object):
                     area_desc = ''
                     for area_name, area_relevance in company['area'].items():
                         area_desc += area_name + '(相关度：' + str(area_relevance) + '}'
-
+                    company_desc = '%s 目前的主营领域有: %s' % (company['name'], area_desc)
+                    player.known_company[company_code] = company_desc
                     # 返回公司信息
-                    print('%s 目前的主营领域有: %s' % (company['name'], area_desc))
+                    print(company_desc)
                     print('你现在的资金：%.2f' % player.fund)
                 else:
                     print('没有找到这个公司')
@@ -752,7 +770,7 @@ class play_console(object):
                 # 调研信息
                 elif cmd == 'd':
                     # 调查市场  调研公司
-                    company_or_market = input('输入公司代码调研公司，输入"enter"调研市场：')
+                    company_or_market = input('输入公司代码调研公司，默认调研市场：')
 
                     # 输入enter nothing
                     if len(company_or_market) == 0:
@@ -777,6 +795,7 @@ class play_console(object):
                         try:
                             market_company = this_market.market_obj[company_code]
 
+
                         except KeyError as e:
                             # 没找到，模糊搜索
                             company_code = this_market.fuzzy_search_company_name(company_code)
@@ -787,6 +806,7 @@ class play_console(object):
                                 if c.upper() == 'Y':
                                     # market_company = this_market.market_obj[company_code]
                                     pass
+
                                 elif c.upper() == 'N':
                                     continue
                                 else:
@@ -795,6 +815,12 @@ class play_console(object):
                             else:
                                 print('公司代码不存在')
                                 continue
+
+                        try:
+                            company_desc = player.known_company[company_code]
+                            print(company_desc)
+                        except KeyError as e:
+                            pass
 
                         cost = input('花费多少钱进行调研？(默认100一次)')
                         if len(cost) > 0:
